@@ -1,0 +1,117 @@
+name: Executavel
+
+# O PyInstaller nao faz cross-compile: para sair um .exe de Windows, o build
+# precisa rodar no Windows. Por isso o executavel sai daqui, e nao da maquina
+# de desenvolvimento.
+on:
+  workflow_dispatch:        # botao "Run workflow" na aba Actions
+  push:
+    tags: ["v*"]            # uma tag v1.0.0 tambem publica uma release
+  pull_request:
+    paths:                  # so quando o empacotamento em si muda
+      - "build_exe.py"
+      - "TimelineSync.py"
+      - "build/**"
+      - ".github/workflows/build-exe.yml"
+      - "timeline_sync/runtime.py"
+      - "timeline_sync/launcher.py"
+
+permissions:
+  contents: write           # necessario para anexar os binarios a release
+
+jobs:
+  windows:
+    name: Windows (.exe)
+    runs-on: windows-latest
+    # O build leva ~2 min. O teto existe para um travamento nao consumir as 6h
+    # padrao do runner antes de alguem perceber.
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias de build
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller tzdata
+
+      - name: Instalar ffmpeg (so para gerar o material de teste)
+        run: choco install ffmpeg -y --no-progress
+        continue-on-error: true
+
+      - name: Gerar material de teste
+        # Sem material, o build_exe.py ainda empacota e verifica o executavel,
+        # mas pula o teste de organizar de verdade. Com material, a verificacao
+        # cobre o caminho completo: ler metadado, agrupar e exportar XML.
+        run: python gerar_testes.py --cenario 2 --escala 0.4
+        continue-on-error: true
+
+      - name: Empacotar e verificar
+        run: python build_exe.py
+
+      - name: Conferir o que saiu
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse dist | Where-Object { -not $_.PSIsContainer } |
+            Select-Object FullName, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} |
+            Format-Table -AutoSize
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TimelineSync-windows
+          retention-days: 90
+          if-no-files-found: error
+          path: |
+            dist/onefile/TimelineSync.exe
+            dist/TimelineSync-windows-pasta.zip
+
+      - name: Publicar na release (so em tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/onefile/TimelineSync.exe
+            dist/TimelineSync-windows-pasta.zip
+          body: |
+            ## Timeline Sync — executavel para Windows
+
+            **`TimelineSync.exe`** — arquivo unico. Baixe e clique duas vezes;
+            a interface abre no navegador em `http://127.0.0.1:8730`.
+
+            **`TimelineSync-windows-pasta.zip`** — a mesma coisa em formato de
+            pasta. Inicia mais rapido e da menos atrito com antivirus. Use se o
+            arquivo unico travar.
+
+            ### Na primeira vez o Windows vai reclamar
+
+            O executavel nao e assinado digitalmente (certificado custa caro e
+            isto e um app pessoal). O SmartScreen mostra "Windows protegeu o seu
+            computador" → **Mais informacoes** → **Executar assim mesmo**.
+
+            ### ffmpeg e opcional
+
+            O app le MP4, MOV e WAV com parser proprio e nao precisa de ffmpeg
+            para organizar e exportar. Ele so e necessario para o refino de sync
+            por audio. Para habilitar, coloque `ffmpeg.exe` e `ffprobe.exe` na
+            mesma pasta do `TimelineSync.exe`.
+
+  # Confere que o empacotamento tambem funciona fora do Windows. Nao produz
+  # entregavel — serve para o build nao quebrar so num sistema.
+  linux:
+    name: Linux (verificacao)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller tzdata
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: python gerar_testes.py --cenario 2 --escala 0.4
+      - run: python build_exe.py --modo onefile

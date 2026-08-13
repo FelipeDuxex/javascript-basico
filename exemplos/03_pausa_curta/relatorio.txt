@@ -1,0 +1,28 @@
+=== RESUMO DA IMPORTACAO ===
+52 arquivos lidos | 2 dispositivos | 1 dias | 2 blocos | 26 takes
+Leitura parcial: 329.2 KB efetivamente transferidos de 3.5 MB totais (9.1244% do material)
+Tempo de leitura: 0s (0.1s)
+Estrategias de leitura: atoms: 52
+
+--- DISPOSITIVOS ---
+  iPhone iPhone 15 Pro [iphone] | 26 clipes | offset +0s | referencia de hora (fuso explicito no metadado)
+  Sony ILCE-7M3 [sony] | 26 clipes | offset +0s | NAO CALIBRADO
+
+DIA 01 | 2026-08-13 | 2 blocos | 52 clipes
+  BLOCO 01 | 10:00-10:42 | 42min | 26 clipes | Sony ILCE-7M3(13) iPhone iPhone 15 Pro(13)
+  BLOCO 02 | 11:06-11:48 | 42min | 26 clipes | Sony ILCE-7M3(13) iPhone iPhone 15 Pro(13)
+  Limiar de pausa detectado (auto/ratio): 9 min
+  → maior salto 6.2x entre intervalos ordenados
+
+--- AVISOS ---
+  ! Sony ILCE-7M3 nao esta calibrado. O horario dele vem do relogio interno e pode estar errado por horas. Cadastre com um clipe do iPhone.
+
+--- XMLS GERADOS ---
+  /home/user/javascript-basico/exemplos/03_pausa_curta/DIA_01_2026-08-13.xml
+
+--- CONFIGURACAO USADA ---
+  fuso: America/Sao_Paulo | virada de dia: 4h
+  blocos: metodo=auto piso=2 min teto=6/dia razao_min=2.5x
+  takes: janela de 10s
+  tempo morto: compress (fator 0.1)
+  cores: por bloco | sequencia 1080x1920@30

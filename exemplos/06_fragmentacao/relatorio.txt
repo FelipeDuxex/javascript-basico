@@ -1,0 +1,32 @@
+=== RESUMO DA IMPORTACAO ===
+80 arquivos lidos | 2 dispositivos | 1 dias | 6 blocos | 40 takes
+Leitura parcial: 486.2 KB efetivamente transferidos de 5.2 MB totais (9.1582% do material)
+Tempo de leitura: 0s (0.2s)
+Estrategias de leitura: atoms: 80
+
+--- DISPOSITIVOS ---
+  iPhone iPhone 15 Pro [iphone] | 40 clipes | offset +0s | referencia de hora (fuso explicito no metadado)
+  Sony ILCE-7M3 [sony] | 40 clipes | offset +0s | NAO CALIBRADO
+
+DIA 01 | 2026-08-13 | 6 blocos | 80 clipes
+  BLOCO 01 | 08:00-08:12 | 12min | 8 clipes | Sony ILCE-7M3(4) iPhone iPhone 15 Pro(4)
+  BLOCO 02 | 08:27-09:01 | 34min | 16 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8)
+  BLOCO 03 | 09:24-10:00 | 36min | 16 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8)
+  BLOCO 04 | 10:18-10:30 | 12min | 8 clipes | Sony ILCE-7M3(4) iPhone iPhone 15 Pro(4)
+  BLOCO 05 | 10:57-11:30 | 33min | 16 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8)
+  BLOCO 06 | 11:50-12:28 | 38min | 16 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8)
+  Limiar de pausa detectado (auto/jenks): 12 min
+  → razao maxima fraca (2.1x), jenks separou (GVF 0.83, 4.3x); teto de 6 blocos/dia acionado: 1 fronteira(s) mesclada(s) pelos menores intervalos
+
+--- AVISOS ---
+  ! Sony ILCE-7M3 nao esta calibrado. O horario dele vem do relogio interno e pode estar errado por horas. Cadastre com um clipe do iPhone.
+
+--- XMLS GERADOS ---
+  /home/user/javascript-basico/exemplos/06_fragmentacao/DIA_01_2026-08-13.xml
+
+--- CONFIGURACAO USADA ---
+  fuso: America/Sao_Paulo | virada de dia: 4h
+  blocos: metodo=auto piso=2 min teto=6/dia razao_min=2.5x
+  takes: janela de 10s
+  tempo morto: compress (fator 0.1)
+  cores: por bloco | sequencia 1080x1920@30

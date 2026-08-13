@@ -1,0 +1,77 @@
+TIMELINE SYNC — executavel para Windows
+=======================================
+
+COMO USAR
+---------
+Clique duas vezes em TimelineSync.exe.
+
+Uma janela preta de console abre (nao feche — e o programa rodando) e o
+navegador abre sozinho em http://127.0.0.1:8730
+
+Para encerrar: feche a janela do console, ou Ctrl+C nela.
+
+
+NA PRIMEIRA VEZ O WINDOWS VAI RECLAMAR
+--------------------------------------
+"O Windows protegeu o seu computador" → Mais informacoes → Executar assim mesmo.
+
+O executavel nao tem assinatura digital. Certificado de assinatura de codigo e
+caro e isto e um programa pessoal, entao o SmartScreen desconfia de qualquer
+executavel novo que ele nunca viu. Alguns antivirus tambem marcam executaveis
+feitos com PyInstaller como suspeitos — e falso positivo conhecido do
+empacotador, nao tem nada a ver com o que o programa faz.
+
+Se o antivirus apagar o arquivo, use a versao em pasta
+(TimelineSync-windows-pasta.zip): ela costuma passar sem atrito.
+
+
+FFMPEG E OPCIONAL
+-----------------
+O app le MP4, MOV e WAV com parser proprio. Para organizar o material e
+exportar os XMLs, NAO precisa de ffmpeg.
+
+O ffmpeg so e necessario para:
+  - o botao "Refinar sync por audio"
+  - o refino por palma na calibracao (o offset em horas funciona sem ele)
+  - gerar material de teste sintetico
+
+Para habilitar: baixe o ffmpeg (https://www.gyan.dev/ffmpeg/builds/) e coloque
+ffmpeg.exe e ffprobe.exe na MESMA PASTA do TimelineSync.exe. O app acha
+sozinho, sem precisar mexer no PATH do Windows.
+
+
+LINHA DE COMANDO
+----------------
+O mesmo executavel atende a linha de comando:
+
+  TimelineSync.exe organizar "G:\Meu Drive\SEMANA_01" --saida saida
+  TimelineSync.exe calibrar C0020.MP4 IMG_0431.MOV
+  TimelineSync.exe manifesto E:\CARTAO_SONY
+  TimelineSync.exe dispositivos
+  TimelineSync.exe --help
+
+
+ONDE FICAM OS SEUS DADOS
+------------------------
+C:\Users\<voce>\.timeline_sync\
+  dispositivos.json         perfis de camera e offsets calibrados
+  cache_metadados.sqlite    cache de metadado ja lido
+  projetos\<nome>.json       ajustes de bloco por projeto
+
+Nada disso contem video — so metadado e preferencias. Apagar e seguro: o app
+rele o que precisar.
+
+O programa nunca modifica, move ou renomeia os seus arquivos de video. Ele so
+le, e so alguns KB por arquivo.
+
+
+ANTES DE GRAVAR: CONFIRA O RELOGIO DA SONY
+------------------------------------------
+Cameras Sony gravam a hora literal do relogio interno e rotulam como UTC, sem
+converter fuso. Se o relogio estiver errado, o horario sai errado por horas.
+
+O app corrige isso por calibracao (grave alguns segundos com a camera e com o
+iPhone ao mesmo tempo, e rode "Calibrar" na aba Dispositivos), mas acertar o
+relogio da camera antes evita o problema na origem.
+
+O iPhone nunca precisa de calibracao: ele acerta a hora sozinho e grava o fuso.

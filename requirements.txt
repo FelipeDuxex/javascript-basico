@@ -1,0 +1,12 @@
+# O Timeline Sync nao tem dependencia obrigatoria: o core, a exportacao e a
+# interface web usam apenas a biblioteca padrao do Python (3.9+).
+#
+# Opcional — acelera a correlacao cruzada do refino por audio. Sem numpy, o app
+# usa uma implementacao em Python puro sobre uma janela reduzida.
+numpy>=1.21 ; python_version >= "3.9"
+
+# Fora do pip, e util ter no PATH:
+#   ffmpeg / ffprobe  -> fallback de leitura, refino por audio, gerar_testes.py
+#     Ubuntu/Debian:  sudo apt install ffmpeg
+#     macOS:          brew install ffmpeg
+#     Windows:        winget install Gyan.FFmpeg

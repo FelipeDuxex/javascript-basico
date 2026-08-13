@@ -1,0 +1,77 @@
+=== RESUMO DA IMPORTACAO ===
+300 arquivos lidos | 4 dispositivos | 5 dias | 14 blocos | 115 takes
+Leitura parcial: 1.5 MB efetivamente transferidos de 100.8 MB totais (1.4789% do material)
+Tempo de leitura: 1s (0.6s)
+Estrategias de leitura: atoms: 245, bwf: 55
+
+--- DISPOSITIVOS ---
+  Sony ILCE-7M3 [sony] | 110 clipes | offset -3h02min02s | calibrado 2026-08-13
+  iPhone iPhone 15 Pro [iphone] | 109 clipes | offset +0s | referencia de hora (fuso explicito no metadado)
+  Hollyland [hollyland] | 55 clipes | offset +0s | NAO CALIBRADO
+  DJI Osmo Action 4 [dji] | 26 clipes | offset +1h00min47s | calibrado 2026-08-13
+
+DIA 01 | 2026-08-13 | 3 blocos | 52 clipes
+  BLOCO 01 | 09:30-10:20 | 50min | 24 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8) Hollyland(8)
+  BLOCO 02 | 13:00-14:11 | 1h11 | 22 clipes | Sony ILCE-7M3(11) iPhone iPhone 15 Pro(11)
+  BLOCO 03 | 19:00-19:35 | 35min | 6 clipes | Sony ILCE-7M3(6)
+  Limiar de pausa detectado (auto/ratio): 34 min
+  → maior salto 21.8x entre intervalos ordenados
+
+DIA 02 | 2026-08-14 | 2 blocos | 62 clipes
+  BLOCO 01 | 10:00-10:57 | 57min | 18 clipes | Sony ILCE-7M3(9) iPhone iPhone 15 Pro(9)
+  BLOCO 02 | 15:00-16:12 | 1h12 | 44 clipes | Sony ILCE-7M3(11) iPhone iPhone 15 Pro(11) DJI Osmo Action 4(11) Hollyland(11)
+  Limiar de pausa detectado (auto/ratio): 41 min
+  → maior salto 33.6x entre intervalos ordenados
+
+DIA 03 | 2026-08-15 | 4 blocos | 61 clipes
+  BLOCO 01 | 08:30-09:12 | 42min | 21 clipes | Sony ILCE-7M3(7) iPhone iPhone 15 Pro(7) Hollyland(7)
+  BLOCO 02 | 11:30-12:13 | 43min | 14 clipes | Sony ILCE-7M3(7) iPhone iPhone 15 Pro(7)
+  BLOCO 03 | 15:00-15:42 | 42min | 21 clipes | Sony ILCE-7M3(7) iPhone iPhone 15 Pro(7) DJI Osmo Action 4(7)
+  BLOCO 04 | 20:00-20:29 | 29min | 5 clipes | iPhone iPhone 15 Pro(5)
+  Limiar de pausa detectado (auto/ratio): 31 min
+  → maior salto 18.8x entre intervalos ordenados
+
+DIA 04 | 2026-08-16 | 2 blocos | 60 clipes
+  BLOCO 01 | 09:00-10:12 | 1h12 | 33 clipes | Sony ILCE-7M3(11) iPhone iPhone 15 Pro(11) Hollyland(11)
+  BLOCO 02 | 14:30-15:27 | 57min | 27 clipes | Sony ILCE-7M3(9) iPhone iPhone 15 Pro(9) Hollyland(9)
+  Limiar de pausa detectado (auto/ratio): 43 min
+  → maior salto 35.8x entre intervalos ordenados
+
+DIA 05 | 2026-08-17 | 3 blocos | 65 clipes
+  BLOCO 01 | 10:30-11:19 | 49min | 24 clipes | Sony ILCE-7M3(8) iPhone iPhone 15 Pro(8) DJI Osmo Action 4(8)
+  BLOCO 02 | 13:30-14:13 | 43min | 14 clipes | Sony ILCE-7M3(7) iPhone iPhone 15 Pro(7)
+  BLOCO 03 | 17:00-17:56 | 56min | 27 clipes | Sony ILCE-7M3(9) iPhone iPhone 15 Pro(9) Hollyland(9)
+  Limiar de pausa detectado (auto/ratio): 30 min
+  → maior salto 18.0x entre intervalos ordenados
+
+--- AVISOS ---
+  ! Hollyland nao esta calibrado. O horario dele vem do relogio interno e pode estar errado por horas. Cadastre com um clipe do iPhone.
+  ! 11 take(s) cobertos por um unico dispositivo — geralmente falta de audio externo ou camera que nao rodou.
+
+--- TAKES ORFAOS (11) — um unico dispositivo gravou ---
+  2026-08-13 19:00:00 | C0040.MP4
+  2026-08-13 19:07:20 | C0041.MP4
+  2026-08-13 19:14:25 | C0042.MP4
+  2026-08-13 19:21:32 | C0043.MP4
+  2026-08-13 19:28:21 | C0044.MP4
+  2026-08-13 19:35:48 | C0045.MP4
+  2026-08-15 20:00:00 | IMG_0061.MOV
+  2026-08-15 20:07:12 | IMG_0062.MOV
+  2026-08-15 20:14:39 | IMG_0063.MOV
+  2026-08-15 20:21:44 | IMG_0064.MOV
+  2026-08-15 20:29:08 | IMG_0065.MOV
+
+--- XMLS GERADOS ---
+  /home/user/javascript-basico/exemplos/05_semana_completa/DIA_01_2026-08-13.xml
+  /home/user/javascript-basico/exemplos/05_semana_completa/DIA_02_2026-08-14.xml
+  /home/user/javascript-basico/exemplos/05_semana_completa/DIA_03_2026-08-15.xml
+  /home/user/javascript-basico/exemplos/05_semana_completa/DIA_04_2026-08-16.xml
+  /home/user/javascript-basico/exemplos/05_semana_completa/DIA_05_2026-08-17.xml
+  /home/user/javascript-basico/exemplos/05_semana_completa/MASTER_todos_os_dias.xml
+
+--- CONFIGURACAO USADA ---
+  fuso: America/Sao_Paulo | virada de dia: 4h
+  blocos: metodo=auto piso=2 min teto=6/dia razao_min=2.5x
+  takes: janela de 10s
+  tempo morto: compress (fator 0.1)
+  cores: por bloco | sequencia 1080x1920@30
