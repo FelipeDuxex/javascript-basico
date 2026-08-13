@@ -23,6 +23,9 @@ jobs:
   windows:
     name: Windows (.exe)
     runs-on: windows-latest
+    # O build leva ~2 min. O teto existe para um travamento nao consumir as 6h
+    # padrao do runner antes de alguem perceber.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -100,6 +103,7 @@ jobs:
   linux:
     name: Linux (verificacao)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

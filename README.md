@@ -45,10 +45,15 @@ grava o fuso explicitamente. **Ele é sempre a referência de hora.**
 
 ### Opção A — executável para Windows (sem instalar nada)
 
-Baixe `TimelineSync.exe` na aba
-[Releases](https://github.com/FelipeDuxex/timeline-sync/releases) (ou nos
-artefatos da aba **Actions**, no workflow *Executavel*). Clique duas vezes: uma
-janela de console abre e o navegador vai para `http://127.0.0.1:8730`.
+O executável é construído no CI a cada tag `v*` e fica em
+[Releases](https://github.com/FelipeDuxex/timeline-sync/releases). Enquanto não
+houver release, pegue o build mais recente na aba **Actions** → workflow
+**Executavel** → última execução → artefato `TimelineSync-windows` (é um `.zip`
+com o `.exe` e a versão em pasta dentro; o GitHub sempre empacota artefatos em
+zip).
+
+Clique duas vezes no `TimelineSync.exe`: uma janela de console abre e o
+navegador vai para `http://127.0.0.1:8730`.
 
 Duas coisas que vão acontecer e são normais:
 
