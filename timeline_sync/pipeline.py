@@ -23,6 +23,7 @@ from .devices import DeviceRegistry
 from .grouping import build_project
 from .models import Clip, Project
 from .reader import ScanResult, scan
+from .runtime import tool_status
 from .timeline import build_layout
 
 
@@ -286,6 +287,7 @@ class Session:
                                         "total_offset": p.total_offset}
                          for p in self.registry.profiles.values()],
             "cache_count": self.cache.count(),
+            "ferramentas": tool_status(),
             "volume": {
                 "is_cloud": bool(self.volume and self.volume.is_cloud),
                 "provider": self.volume.provider if self.volume else "",

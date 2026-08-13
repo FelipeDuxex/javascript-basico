@@ -75,6 +75,28 @@ function aplicaEstado() {
     }
   }
   $('info-cache').textContent = `cache: ${estado.cache_count ?? 0} arquivos`;
+
+  // O refino por áudio depende de ffmpeg. Sem ele o botão fica desabilitado e
+  // dizendo o porquê, em vez de existir e falhar quando clicado.
+  const fer = estado.ferramentas || {};
+  const temFfmpeg = !!fer.tem_ffmpeg;
+  const btnRefino = $('btn-refinar');
+  if (btnRefino) {
+    btnRefino.disabled = !temFfmpeg;
+    btnRefino.title = temFfmpeg
+      ? `usando ${fer.ffmpeg}`
+      : `ffmpeg não encontrado — coloque ffmpeg.exe em ${fer.pasta_app || 'na pasta do app'}`;
+  }
+  const calAudio = $('cal-audio');
+  if (calAudio) {
+    calAudio.disabled = !temFfmpeg;
+    if (!temFfmpeg) calAudio.checked = false;
+    const rotulo = calAudio.closest('label');
+    if (rotulo) {
+      rotulo.style.opacity = temFfmpeg ? '1' : '.5';
+      rotulo.title = temFfmpeg ? '' : 'requer ffmpeg (o offset em horas funciona sem ele)';
+    }
+  }
   const vol = estado.volume || {};
   const pv = $('info-volume');
   if (vol.is_cloud) {

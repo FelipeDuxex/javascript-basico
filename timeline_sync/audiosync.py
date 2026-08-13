@@ -16,17 +16,21 @@ uma janela reduzida.
 from __future__ import annotations
 
 import array
-import shutil
 import subprocess
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
+from .runtime import find_tool
+
 SAMPLE_RATE = 8000       # suficiente para transientes; mantem o custo baixo
 
 
+def _binario() -> str:
+    return find_tool("ffmpeg") or "ffmpeg"
+
+
 def available() -> bool:
-    return shutil.which(FFMPEG) is not None
+    return find_tool("ffmpeg") is not None
 
 
 def _numpy():
@@ -43,7 +47,7 @@ def decode_mono(path: str, seconds: float = 30.0,
     if not available():
         return None
     cmd = [
-        FFMPEG, "-v", "error", "-ss", f"{start:.3f}", "-t", f"{seconds:.3f}",
+        _binario(), "-v", "error", "-ss", f"{start:.3f}", "-t", f"{seconds:.3f}",
         "-i", path, "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE),
         "-f", "s16le", "-",
     ]
@@ -103,12 +107,44 @@ class SyncRefinement:
                 "confidence": self.confidence, "method": self.method}
 
 
+PICO_MINIMO = 2.0     # razao pico/media exigida para o audio ter transiente
+
+
+def _tem_transiente(env: List[float]) -> bool:
+    """O envelope tem algum evento destacado, ou e um zumbido uniforme?
+
+    Correlacionar dois sinais planos devolve um numero, mas esse numero e ruido:
+    nao ha evento em comum para alinhar. Melhor recusar do que responder.
+    """
+    if not env:
+        return False
+    media = sum(env) / len(env)
+    return media > 0 and max(env) / media >= PICO_MINIMO
+
+
+def _limites_de_deslocamento(n_a: int, n_b: int, max_shift: int,
+                             min_overlap: int) -> Tuple[int, int]:
+    """Faixa de deslocamentos com sobreposicao suficiente para valer a pena.
+
+    Sem esse corte, deslocamentos extremos comparam meia duzia de amostras e
+    podem ganhar por acaso — foi assim que a versao anterior chegou a apontar
+    -6,5s entre dois clipes que nem transiente tinham.
+    """
+    menor = max(-max_shift, min_overlap - n_b)
+    maior = min(max_shift, n_a - min_overlap)
+    return menor, maior
+
+
 def cross_correlate(reference: str, other: str, window_seconds: float = 30.0,
                     max_shift_seconds: float = 10.0) -> Optional[SyncRefinement]:
     """Deslocamento de `other` em relacao a `reference` por correlacao cruzada.
 
     Positivo = `other` comeca depois. Usa envelope de energia, que e robusto a
     diferenca de microfone/ganho entre um iPhone e um Hollyland.
+
+    Devolve None quando nenhum dos dois audios tem transiente: sem um evento em
+    comum (palma, claquete, batida de porta) nao ha o que alinhar, e um palpite
+    seria pior que nao responder.
     """
     a = decode_mono(reference, seconds=window_seconds)
     b = decode_mono(other, seconds=window_seconds)
@@ -119,8 +155,16 @@ def cross_correlate(reference: str, other: str, window_seconds: float = 30.0,
     eb = envelope(b, window)
     if len(ea) < 8 or len(eb) < 8:
         return None
+    if not _tem_transiente(ea) and not _tem_transiente(eb):
+        return None
+
     step = window / SAMPLE_RATE
     max_shift = int(max_shift_seconds / step)
+    min_overlap = max(8, int(0.5 * min(len(ea), len(eb))))
+    menor, maior = _limites_de_deslocamento(len(ea), len(eb), max_shift,
+                                            min_overlap)
+    if menor > maior:
+        return None
 
     np = _numpy()
     if np is not None:
@@ -132,37 +176,72 @@ def cross_correlate(reference: str, other: str, window_seconds: float = 30.0,
             return None
         full = np.correlate(va, vb, mode="full")
         center = len(vb) - 1
-        lo = max(center - max_shift, 0)
-        hi = min(center + max_shift + 1, len(full))
+        lo = center + menor
+        hi = center + maior + 1
         segment = full[lo:hi]
+        if not len(segment):
+            return None
         best = int(np.argmax(segment)) + lo
         peak = float(segment.max())
         norm = float(np.sqrt((va ** 2).sum() * (vb ** 2).sum())) or 1.0
         return SyncRefinement((best - center) * step, peak / norm, "numpy")
 
-    # Python puro: janela limitada para nao ficar caro.
+    # Python puro, em duas passadas. A busca exaustiva seria ~24 milhoes de
+    # multiplicacoes (dezenas de segundos por par de clipes) — inaceitavel para
+    # um botao de refino. Uma varredura grosseira sobre os sinais decimados
+    # acha a regiao certa, e a passada fina so ajusta em volta dela: mesma
+    # resposta, ~100x mais rapido. Com isso o numpy fica de fato opcional, e o
+    # executavel nao precisa carrega-lo.
     mean_a = sum(ea) / len(ea)
     mean_b = sum(eb) / len(eb)
     va = [v - mean_a for v in ea]
     vb = [v - mean_b for v in eb]
+
+    fator = 8
+    if (maior - menor) > 4 * fator and min(len(va), len(vb)) > 4 * fator:
+        ca = _decima(va, fator)
+        cb = _decima(vb, fator)
+        grosso, _ = _melhor_deslocamento(ca, cb, menor // fator, maior // fator)
+        centro = grosso * fator
+        janela = fator * 2
+        best_shift, best_score = _melhor_deslocamento(
+            va, vb, max(centro - janela, menor), min(centro + janela, maior))
+    else:
+        best_shift, best_score = _melhor_deslocamento(va, vb, menor, maior)
+
+    denom = (sum(v * v for v in va) * sum(v * v for v in vb)) ** 0.5 or 1.0
+    return SyncRefinement(best_shift * step, best_score / denom, "puro")
+
+
+def _decima(valores: List[float], fator: int) -> List[float]:
+    """Reduz o sinal pela media de blocos — preserva a posicao dos transientes."""
+    out: List[float] = []
+    for i in range(0, len(valores) - fator + 1, fator):
+        out.append(sum(valores[i:i + fator]) / fator)
+    return out
+
+
+def _melhor_deslocamento(va: List[float], vb: List[float], menor: int,
+                         maior: int) -> Tuple[int, float]:
+    """Deslocamento de maior correlacao no intervalo [menor, maior]."""
     best_shift = 0
     best_score = float("-inf")
-    for shift in range(-max_shift, max_shift + 1):
-        score = 0.0
-        count = 0
-        for i, value in enumerate(vb):
-            j = i + shift
-            if 0 <= j < len(va):
-                score += va[j] * value
-                count += 1
-        if count < 8:
+    n_a, n_b = len(va), len(vb)
+    for shift in range(menor, maior + 1):
+        inicio = max(0, -shift)
+        fim = min(n_b, n_a - shift)
+        if fim - inicio < 8:
             continue
-        score /= count
+        # Soma crua, SEM dividir pela sobreposicao: dividir favoreceria
+        # deslocamentos extremos, onde poucas amostras se encontram. E a mesma
+        # definicao que o caminho com numpy usa, para os dois concordarem.
+        score = 0.0
+        for i in range(inicio, fim):
+            score += va[i + shift] * vb[i]
         if score > best_score:
             best_score = score
             best_shift = shift
-    denom = (sum(v * v for v in va) * sum(v * v for v in vb)) ** 0.5 or 1.0
-    return SyncRefinement(best_shift * step, best_score * len(vb) / denom, "puro")
+    return best_shift, best_score
 
 
 def refine_take(clips, window_seconds: float = 30.0) -> List[Tuple[str, float]]:

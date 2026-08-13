@@ -9,15 +9,20 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import subprocess
-from .mp4reader import Mp4Metadata, TrackInfo, parse_iso_datetime
 
-FFPROBE = shutil.which("ffprobe") or "ffprobe"
+from .mp4reader import Mp4Metadata, TrackInfo, parse_iso_datetime
+from .runtime import find_tool
+
+
+def _binario() -> str:
+    # Resolvido a cada chamada: no executavel congelado o usuario pode largar o
+    # ffprobe.exe ao lado do app depois que ele ja estava aberto.
+    return find_tool("ffprobe") or "ffprobe"
 
 
 def available() -> bool:
-    return shutil.which(FFPROBE) is not None or os.path.isfile(FFPROBE)
+    return find_tool("ffprobe") is not None
 
 
 def read_metadata(path: str, timeout: float = 120.0) -> Mp4Metadata:
@@ -28,7 +33,7 @@ def read_metadata(path: str, timeout: float = 120.0) -> Mp4Metadata:
     except OSError:
         pass
     cmd = [
-        FFPROBE, "-v", "error", "-print_format", "json",
+        _binario(), "-v", "error", "-print_format", "json",
         "-show_format", "-show_streams", path,
     ]
     try:

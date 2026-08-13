@@ -1,6 +1,6 @@
 ==============================================================================
 TIMELINE SYNC — VALIDACAO DOS CENARIOS
-gerado em 2026-08-13 07:50:56
+gerado em 2026-08-13 15:39:44
 ==============================================================================
 
 CENARIO 1: Fuso errado (Sony 3h adiantada)  =>  PASSOU
@@ -233,6 +233,16 @@ EXTRA: Troca da raiz da midia no XML  =>  PASSOU
     [OK  ] os pathurl saem apontando para a raiz nova (sem relink manual)
     [OK  ] nenhum caminho antigo sobrou no XML
 
+EXTRA: Refino por audio (numpy vs Python puro)  =>  PASSOU
+    com palma: numpy=2.4s puro=2.4s
+    [OK  ] audio com transiente produz resultado nos dois caminhos
+    [OK  ] numpy e Python puro concordam (+2.400s vs +2.400s)
+    [OK  ] o deslocamento medido (+2.400s) bate com os 2,4s de diferenca real entre os inicios
+    [OK  ] audio sem transiente: os dois caminhos RECUSAM responder, em vez de devolver ruido com cara de resultado
+
+EXTRA: Executavel empacotado  =>  PASSOU
+    [OK  ] o executavel responde a --versao: timeline_sync 1.0.0
+
 ==============================================================================
-RESULTADO: 13/13 verificacoes de cenario passaram
+RESULTADO: 15/15 verificacoes de cenario passaram
 ==============================================================================

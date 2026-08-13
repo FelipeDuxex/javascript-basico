@@ -335,7 +335,96 @@ todo mundo, o offset está errado, sem exceção prática.
 
 ---
 
-## 13. Escolhas menores
+## 13. Executável: PyInstaller, dois formatos, e o ffmpeg de fora
+
+**O `.exe` sai do CI, não da máquina de desenvolvimento.** O PyInstaller não faz
+cross-compile — ele empacota o interpretador do sistema em que roda. Para sair
+um executável de Windows é preciso um Windows, e é isso que
+`.github/workflows/build-exe.yml` faz. `build_exe.py` roda em qualquer sistema e
+serve para validar o empacotamento em si (recursos embutidos, imports
+dinâmicos, inicialização) antes de gastar uma rodada de CI.
+
+**Dois formatos, porque eles falham de jeitos diferentes.** `onefile` é o que as
+pessoas esperam de um `.exe`, mas inicia mais devagar (descompacta num
+diretório temporário toda vez) e é o formato que mais atrai falso-positivo de
+antivírus. `onedir` num `.zip` inicia rápido e passa com menos atrito. Publicar
+os dois custa quase nada e dá um plano B real quando o antivírus come o
+primeiro.
+
+**`build_exe.py` verifica o binário de verdade, não só se ele existe.** O modo
+de falha típico do PyInstaller não é falhar o build — é gerar o executável e ele
+morrer no primeiro import dinâmico, ou não achar os arquivos da interface. Então
+a verificação roda o binário: `--versao`, `dispositivos`, `cache`, uma
+organização completa com exportação de XML, e sobe o servidor buscando `/`,
+`/static/style.css`, `/static/app.js` e `/api/estado`. Sem isso, "build passou"
+não significaria nada.
+
+**`ffmpeg` não vai embutido.** São dezenas de MB e licença própria, e o app não
+precisa dele: os parsers próprios cobrem MP4, MOV e WAV, que é todo o material.
+Ele só habilita o refino por áudio. Em vez de embutir ou exigir PATH,
+`runtime.find_tool()` procura **ao lado do executável** primeiro (e em
+`ferramentas/`, `bin/`, `ffmpeg/bin/`) e só depois no PATH — largar
+`ffmpeg.exe` na pasta do app basta. A resolução acontece a cada chamada, não na
+importação, então dá para largar o binário com o app já aberto. A interface
+desabilita o botão de refino e explica o motivo quando ele não está presente.
+
+**`numpy` também fica de fora — mas só depois de eu tornar isso verdade.** A
+versão original em Python puro fazia busca exaustiva: ~24 milhões de
+multiplicações, dezenas de segundos por par de clipes. Isso tornava o `numpy`
+obrigatório na prática. Reescrevi a correlação em duas passadas (varredura sobre
+os sinais decimados por 8, depois ajuste fino em volta do resultado): mesma
+resposta, tempo comparável ao `numpy`. Com isso o executável economiza ~30 MB e
+uma fonte conhecida de problema no empacotamento, e quem roda do código-fonte
+com `numpy` instalado continua usando o caminho vetorizado.
+
+**`tzdata` vai embutido.** O Windows não tem base de fusos do sistema; sem ela o
+`zoneinfo` falha e o app cai no `-03:00` fixo. Isso está correto para São Paulo
+hoje (o Brasil acabou com o horário de verão em 2019), mas quebraria qualquer
+outro fuso — e o fallback silencioso é justamente o tipo de erro que este
+projeto inteiro tenta evitar.
+
+**Console visível, não janela oculta.** `--console` em vez de `--windowed`
+porque o console é onde aparecem a URL, a barra de progresso e os erros. Num app
+sem janela, um erro de inicialização vira "o programa não abre". Pelo mesmo
+motivo o launcher segura a janela com um `input()` quando morre por exceção.
+
+**Duplo-clique abre a interface.** Ninguém que clicou num `.exe` quer digitar
+`web` depois. Sem argumentos o launcher sobe o servidor e abre o navegador; com
+argumentos ele se comporta exatamente como a CLI. E se a porta 8730 estiver
+ocupada, tenta as 20 seguintes em vez de morrer com um traceback.
+
+**Ícone gerado em Python puro** (`build/gerar_icone.py`), sem Pillow: o desenho é
+o próprio assunto do app (trilhas horizontais com clipes coloridos, nas mesmas
+cores da paleta de blocos). Escrevi como ICO com entradas BMP em vez de
+PNG-dentro-de-ICO porque BMP é lido sem ressalva por qualquer parser; PNG em ICO
+só vale de Vista pra frente e depende de quem está interpretando.
+
+---
+
+## 14. Dois defeitos no refino por áudio, encontrados ao medir
+
+Achados ao comparar os caminhos `numpy` e Python puro durante o trabalho de
+empacotamento. Ambos corrigidos, ambos com teste de regressão.
+
+**As duas implementações discordavam.** O caminho `numpy` usava
+`np.correlate` sem normalizar pela sobreposição; o Python puro dividia pela
+contagem de amostras sobrepostas. Dividir favorece deslocamentos extremos, onde
+poucas amostras se encontram e a média sobe por acaso — foi assim que apareceu
+um `-6,485s` entre dois clipes. Agora os dois usam a soma crua normalizada pelas
+energias globais, e a faixa de deslocamentos é limitada aos que mantêm pelo
+menos 50% de sobreposição.
+
+**A função respondia sobre ruído.** Dados dois áudios sem transiente nenhum
+(zumbido uniforme), ela devolvia um número com aparência de resultado. Não há
+evento em comum para alinhar ali: a resposta é ruído, e um refino baseado em
+ruído é pior que nenhum refino. Agora `cross_correlate` exige razão pico/média
+≥ 2,0 em pelo menos um dos sinais e devolve `None` caso contrário — a mesma
+guarda que `peak_offset` já tinha. Medido no material de teste: os clipes de
+calibração com palma dão 26,85 de razão pico/média, os tons planos dão 1,45.
+
+---
+
+## 15. Escolhas menores
 
 **Português nos nomes de comando, atributos e interface**, com inglês onde é
 termo técnico consagrado (`timebase`, `pathurl`, `label`). É um app de uso

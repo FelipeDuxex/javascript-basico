@@ -1,0 +1,44 @@
+name: Testes
+
+on:
+  push:
+    branches: ["master", "main", "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cenarios:
+    name: Cenarios sinteticos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Lint
+        run: |
+          pip install pyflakes
+          python -m pyflakes timeline_sync/*.py timeline_sync/web/*.py \
+            build/*.py gerar_testes.py rodar_cenarios.py build_exe.py \
+            TimelineSync.py
+
+      - name: Gerar material sintetico
+        # escala reduzida: o CI nao precisa do volume completo para exercitar
+        # as mesmas decisoes de agrupamento.
+        run: python gerar_testes.py --escala 0.5
+
+      - name: Rodar os cenarios
+        run: python rodar_cenarios.py
+
+      - name: Guardar o log e os XMLs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-cenarios
+          retention-days: 30
+          path: exemplos/

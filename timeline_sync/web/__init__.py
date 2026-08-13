@@ -22,8 +22,12 @@ from .. import APP_NAME, __version__
 from ..config import ProjectState, list_projects
 from ..devices import calibrate
 from ..pipeline import Session
+from ..runtime import is_frozen, resource_path
 
-STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+# No executavel congelado os estaticos ficam na pasta temporaria do PyInstaller,
+# nao ao lado deste modulo.
+STATIC_DIR = (resource_path("timeline_sync", "web", "static") if is_frozen()
+              else os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"))
 
 
 class _State:

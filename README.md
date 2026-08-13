@@ -43,13 +43,38 @@ grava o fuso explicitamente. **Ele é sempre a referência de hora.**
 
 ## Instalação
 
+### Opção A — executável para Windows (sem instalar nada)
+
+Baixe `TimelineSync.exe` na aba
+[Releases](https://github.com/FelipeDuxex/timeline-sync/releases) (ou nos
+artefatos da aba **Actions**, no workflow *Executavel*). Clique duas vezes: uma
+janela de console abre e o navegador vai para `http://127.0.0.1:8730`.
+
+Duas coisas que vão acontecer e são normais:
+
+- **O SmartScreen vai reclamar** na primeira execução — "O Windows protegeu o
+  seu computador" → *Mais informações* → *Executar assim mesmo*. O executável
+  não é assinado digitalmente; certificado de assinatura de código custa caro e
+  isto é um app pessoal. Alguns antivírus também marcam executáveis feitos com
+  PyInstaller como suspeitos — é falso-positivo conhecido do empacotador.
+- **Se o antivírus apagar o arquivo**, use a versão em pasta
+  (`TimelineSync-windows-pasta.zip`): mesmo programa, distribuído como pasta em
+  vez de arquivo único. Inicia mais rápido e passa sem atrito com mais
+  frequência.
+
+O mesmo `.exe` atende a linha de comando:
+`TimelineSync.exe organizar "G:\Meu Drive\SEMANA_01"`.
+
+### Opção B — rodando do código-fonte
+
 Requer **Python 3.9+**. Não há dependência obrigatória para instalar — a
 interface roda no servidor HTTP da biblioteca padrão.
 
 ```bash
 git clone https://github.com/FelipeDuxex/timeline-sync.git
 cd timeline-sync
-python -m timeline_sync web        # abre a interface em http://127.0.0.1:8730
+python TimelineSync.py             # abre a interface em http://127.0.0.1:8730
+python -m timeline_sync web        # equivalente
 ```
 
 Opcionais:
@@ -57,7 +82,7 @@ Opcionais:
 | Ferramenta | Para quê | Sem ela |
 |---|---|---|
 | `ffmpeg` / `ffprobe` | fallback de leitura, refino por áudio, gerar material de teste | o parser próprio cobre MP4/MOV/WAV; refino por áudio fica indisponível |
-| `numpy` | acelera a correlação cruzada de áudio | usa uma versão mais lenta em Python puro |
+| `numpy` | acelera a correlação cruzada de áudio | a versão em Python puro dá o mesmo resultado em tempo comparável |
 
 ```bash
 # Ubuntu/Debian
@@ -67,6 +92,26 @@ brew install ffmpeg
 # opcional
 pip install numpy
 ```
+
+**No executável**, o `ffmpeg` não vem embutido (são dezenas de MB e tem licença
+própria). Para habilitar o refino por áudio, coloque `ffmpeg.exe` e
+`ffprobe.exe` **na mesma pasta do `TimelineSync.exe`** — o app acha sozinho, sem
+precisar mexer no PATH do Windows. A interface desabilita o botão de refino e
+diz o motivo quando eles não estão presentes.
+
+### Gerar o executável você mesmo
+
+```bash
+pip install pyinstaller tzdata
+python build_exe.py               # onefile + onedir, com verificação
+```
+
+O PyInstaller **não faz cross-compile**: rodar isso no Linux gera um binário
+Linux, não um `.exe`. O `.exe` sai do workflow
+`.github/workflows/build-exe.yml`, que roda num Windows do CI a cada tag `v*` ou
+sob demanda pelo botão *Run workflow*. Rodar `build_exe.py` localmente serve
+para validar o empacotamento (recursos embutidos, imports dinâmicos,
+inicialização) antes de gastar uma rodada de CI.
 
 ---
 

@@ -5,6 +5,11 @@ material_teste/
 saida/
 *.xml.tmp
 
+# artefatos de empacotamento (o .exe sai do CI)
+dist/
+build/_pyinstaller/
+*.spec
+
 # python
 __pycache__/
 *.py[cod]

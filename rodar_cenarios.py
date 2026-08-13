@@ -586,6 +586,79 @@ def teste_tempo_morto(res: Resultado) -> None:
               "no modo preserve a pausa de 2h aparece inteira na timeline")
 
 
+def teste_refino_audio(res: Resultado) -> None:
+    """O refino por audio: os dois caminhos tem que concordar, e recusar ruido.
+
+    Guarda dois defeitos ja corrigidos: (a) numpy e Python puro usavam
+    normalizacoes diferentes e podiam devolver respostas distintas; (b) a funcao
+    respondia com confianca sobre audio sem transiente nenhum, onde a correlacao
+    e so ruido.
+    """
+    import glob
+
+    from timeline_sync import audiosync
+
+    if not audiosync.available():
+        res.diz("    (ffmpeg ausente — refino por audio nao pode ser testado)")
+        return
+
+    cad = os.path.join(MATERIAL, "01_fuso_errado", "cadastro")
+    com_palma = (os.path.join(cad, "IMG_0900.MOV"), os.path.join(cad, "C0900.MP4"))
+    planos_dir = os.path.join(MATERIAL, "02_blocos_obvios")
+    planos = (sorted(glob.glob(os.path.join(planos_dir, "IMG_*.MOV")))[:1],
+              sorted(glob.glob(os.path.join(planos_dir, "C*.MP4")))[:1])
+
+    def medir(ref, outro, forcar_puro):
+        original = audiosync._numpy
+        if forcar_puro:
+            audiosync._numpy = lambda: None
+        try:
+            return audiosync.cross_correlate(ref, outro)
+        finally:
+            audiosync._numpy = original
+
+    if all(os.path.isfile(p) for p in com_palma):
+        com_np = medir(*com_palma, forcar_puro=False)
+        puro = medir(*com_palma, forcar_puro=True)
+        res.diz(f"    com palma: numpy={com_np and round(com_np.offset_seconds, 3)}s "
+                f"puro={puro and round(puro.offset_seconds, 3)}s")
+        res.checa(com_np is not None and puro is not None,
+                  "audio com transiente produz resultado nos dois caminhos")
+        if com_np and puro:
+            res.checa(abs(com_np.offset_seconds - puro.offset_seconds) < 0.01,
+                      f"numpy e Python puro concordam "
+                      f"({com_np.offset_seconds:+.3f}s vs {puro.offset_seconds:+.3f}s)")
+            # Os clipes de cadastro comecam com 2,4s de diferenca real.
+            res.checa(abs(puro.offset_seconds - 2.4) < 0.1,
+                      f"o deslocamento medido ({puro.offset_seconds:+.3f}s) bate com "
+                      "os 2,4s de diferenca real entre os inicios")
+
+    if planos[0] and planos[1]:
+        ref, outro = planos[0][0], planos[1][0]
+        res.checa(medir(ref, outro, False) is None and medir(ref, outro, True) is None,
+                  "audio sem transiente: os dois caminhos RECUSAM responder, em vez "
+                  "de devolver ruido com cara de resultado")
+
+
+def teste_executavel(res: Resultado) -> None:
+    """Confere o empacotamento, se ja houver um binario construido.
+
+    Nao constroi nada: `build_exe.py` ja faz a verificacao completa. Aqui so
+    garantimos que o que existe em dist/ nao ficou para tras.
+    """
+    import subprocess
+    sufixo = ".exe" if os.name == "nt" else ""
+    alvo = os.path.join(RAIZ, "dist", "onefile", "TimelineSync" + sufixo)
+    if not os.path.isfile(alvo):
+        res.diz("    (nenhum executavel em dist/ — rode `python build_exe.py`)")
+        return
+    proc = subprocess.run([alvo, "--versao"], capture_output=True, text=True,
+                          timeout=120)
+    res.checa(proc.returncode == 0,
+              f"o executavel responde a --versao: "
+              f"{(proc.stdout or proc.stderr).strip()}")
+
+
 def teste_raiz_midia(res: Resultado) -> None:
     """Trocar a raiz da midia tem que reescrever os caminhos do XML."""
     pasta = os.path.join(MATERIAL, "04_dia_continuo")
@@ -625,6 +698,8 @@ EXTRAS: List[Tuple[str, Callable]] = [
     ("Cache persistente (chave sem mtime)", teste_cache),
     ("Fechamento de tempo morto", teste_tempo_morto),
     ("Troca da raiz da midia no XML", teste_raiz_midia),
+    ("Refino por audio (numpy vs Python puro)", teste_refino_audio),
+    ("Executavel empacotado", teste_executavel),
 ]
 
 
