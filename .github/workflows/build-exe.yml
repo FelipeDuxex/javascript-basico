@@ -5,6 +5,13 @@ name: Executavel
 # de desenvolvimento.
 on:
   workflow_dispatch:        # botao "Run workflow" na aba Actions
+    inputs:
+      versao:
+        description: >-
+          Versao para publicar como Release (ex: v1.0.0). Deixe vazio para so
+          gerar o artefato, sem publicar.
+        required: false
+        default: ""
   push:
     tags: ["v*"]            # uma tag v1.0.0 tambem publica uma release
   pull_request:
@@ -68,10 +75,40 @@ jobs:
             dist/onefile/TimelineSync.exe
             dist/TimelineSync-windows-pasta.zip
 
-      - name: Publicar na release (so em tag)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Onde estao os arquivos
+        shell: bash
+        run: |
+          {
+            echo "## Executavel pronto"
+            echo
+            echo "Baixe o artefato **TimelineSync-windows** no final desta pagina."
+            echo "O GitHub entrega artefatos sempre dentro de um \`.zip\`; dentro dele:"
+            echo
+            echo "| Arquivo | O que e |"
+            echo "|---|---|"
+            echo "| \`TimelineSync.exe\` | arquivo unico — clique duas vezes |"
+            echo "| \`TimelineSync-windows-pasta.zip\` | versao em pasta, plano B para antivirus |"
+            echo
+            echo "Para um link permanente e publico, rode este workflow pelo botao"
+            echo "**Run workflow** preenchendo o campo \`versao\` (ex: \`v1.0.0\`) —"
+            echo "ele publica uma Release com os binarios anexados."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Publica a Release quando vier de uma tag `v*` OU quando o workflow for
+      # disparado a mao com o campo `versao` preenchido. O segundo caminho existe
+      # porque artefato de Actions expira, exige login e vem dentro de um zip —
+      # uma Release da um link direto e permanente, que e onde as pessoas
+      # realmente procuram um download.
+      - name: Publicar Release
+        if: >-
+          startsWith(github.ref, 'refs/tags/v') ||
+          (github.event_name == 'workflow_dispatch' && inputs.versao != '')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: >-
+            ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.versao }}
+          name: >-
+            Timeline Sync ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.versao }}
           files: |
             dist/onefile/TimelineSync.exe
             dist/TimelineSync-windows-pasta.zip

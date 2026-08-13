@@ -45,12 +45,25 @@ grava o fuso explicitamente. **Ele é sempre a referência de hora.**
 
 ### Opção A — executável para Windows (sem instalar nada)
 
-O executável é construído no CI a cada tag `v*` e fica em
-[Releases](https://github.com/FelipeDuxex/timeline-sync/releases). Enquanto não
-houver release, pegue o build mais recente na aba **Actions** → workflow
-**Executavel** → última execução → artefato `TimelineSync-windows` (é um `.zip`
-com o `.exe` e a versão em pasta dentro; o GitHub sempre empacota artefatos em
-zip).
+Baixe em **[Releases](../../releases)** — é o link direto e permanente.
+
+<details>
+<summary>Não tem release publicada ainda? Pegue o último build assim</summary>
+
+1. Aba **Actions** (no topo do repositório)
+2. Workflow **Executavel**, na coluna da esquerda
+3. Clique na execução mais recente com ✓ verde
+4. Role até o fim, seção **Artifacts** → baixe `TimelineSync-windows`
+
+Três coisas que confundem nessa rota, e por isso a Release é melhor:
+o download **exige estar logado no GitHub**, o artefato **expira em 90 dias**, e
+o GitHub sempre embrulha artefatos num `.zip` — o `.exe` está dentro dele.
+
+**Para gerar a Release**: Actions → **Executavel** → botão **Run workflow** →
+preencha `versao` com `v1.0.0` → *Run*. Em ~2 minutos a release aparece com os
+binários anexados.
+
+</details>
 
 Clique duas vezes no `TimelineSync.exe`: uma janela de console abre e o
 navegador vai para `http://127.0.0.1:8730`.
