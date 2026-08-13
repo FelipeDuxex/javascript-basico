@@ -1,0 +1,26 @@
+=== RESUMO DA IMPORTACAO ===
+44 arquivos lidos | 2 dispositivos | 1 dias | 3 blocos | 22 takes
+Leitura parcial: 260.2 KB efetivamente transferidos de 2.7 MB totais (9.3770% do material)
+Tempo de leitura: 0s (0.1s)
+Estrategias de leitura: atoms: 44
+
+--- DISPOSITIVOS ---
+  iPhone iPhone 15 Pro [iphone] | 22 clipes | offset +0s | referencia de hora (fuso explicito no metadado)
+  Sony ILCE-7M3 [sony] | 22 clipes | offset -3h02min02s | calibrado 2026-08-13
+
+DIA 01 | 2026-08-13 | 3 blocos | 44 clipes
+  BLOCO 01 | 09:00-09:00 | 10s | 2 clipes | iPhone iPhone 15 Pro(1) Sony ILCE-7M3(1)
+  BLOCO 02 | 10:00-10:27 | 27min | 24 clipes | Sony ILCE-7M3(12) iPhone iPhone 15 Pro(12)
+  BLOCO 03 | 14:00-14:20 | 20min | 18 clipes | Sony ILCE-7M3(9) iPhone iPhone 15 Pro(9)
+  Limiar de pausa detectado (auto/ratio): 12 min
+  → maior salto 22.3x entre intervalos ordenados
+
+--- XMLS GERADOS ---
+  /home/user/javascript-basico/exemplos/01_fuso_errado/DIA_01_2026-08-13.xml
+
+--- CONFIGURACAO USADA ---
+  fuso: America/Sao_Paulo | virada de dia: 4h
+  blocos: metodo=auto piso=2 min teto=6/dia razao_min=2.5x
+  takes: janela de 10s
+  tempo morto: compress (fator 0.1)
+  cores: por bloco | sequencia 1080x1920@30

@@ -1,0 +1,238 @@
+==============================================================================
+TIMELINE SYNC — VALIDACAO DOS CENARIOS
+gerado em 2026-08-13 07:50:56
+==============================================================================
+
+CENARIO 1: Fuso errado (Sony 3h adiantada)  =>  PASSOU
+    antes de calibrar: 44 takes, 44 orfaos
+    [OK  ] sem calibracao os takes NAO casam (Sony 3h fora) — orfaos aparecem
+    [OK  ] avisa que a Sony nao esta calibrada
+    [OK  ] calibracao concluida: Sony ILCE-7M3: relogio marcava 13/08 12:02:04, hora real 13/08 09:00:00 → offset -3h02min02s (refinado por audio em +2.41s)
+    [OK  ] offset calculado -3h02min02s bate com o erro real -3h02min02s (tolerancia 1,5s)
+    [OK  ] refino por audio entrou em acao (+2.41s)
+    44 arquivos | 2 dispositivos | 1 dia(s) | 3 bloco(s) | 22 take(s)
+    leitura parcial: 260.2 KB de 2.7 MB (9.377%) via {'atoms': 44}
+    DIA 01 2026-08-13: 3 bloco(s), 44 clipes, limiar 12 min (auto/ratio)
+        BLOCO 01 09:00-09:00 | 2 clipes | 1 takes | cor Cerulean
+        BLOCO 02 10:00-10:27 | 24 clipes | 12 takes | cor Mango
+        BLOCO 03 14:00-14:20 | 18 clipes | 9 takes | cor Forest
+        -> maior salto 22.3x entre intervalos ordenados
+    [OK  ] depois de calibrar, os 21 takes de gravacao juntam Sony + iPhone
+    [OK  ] maior desvio dentro de um take: 1.6s (janela de 10s)
+    [OK  ] o aviso de 'nao calibrado' desaparece para a Sony
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (3 usadas)
+    [OK  ] 44 pathurl no formato file://
+    XML: {'sequences': 1, 'clipitems': 88, 'markers': 3, 'video_tracks': 2, 'audio_tracks': 2, 'bins': 4, 'labels': 3}
+
+CENARIO 2: Blocos obvios (pausa de 2h)  =>  PASSOU
+    90 arquivos | 3 dispositivos | 1 dia(s) | 2 bloco(s) | 30 take(s)
+    leitura parcial: 378.6 KB de 49.2 MB (0.752%) via {'atoms': 60, 'bwf': 30}
+    DIA 01 2026-08-13: 2 bloco(s), 90 clipes, limiar 32 min (auto/ratio)
+        BLOCO 01 10:00-12:00 | 45 clipes | 15 takes | cor Cerulean
+        BLOCO 02 14:00-15:59 | 45 clipes | 15 takes | cor Mango
+        -> maior salto 13.8x entre intervalos ordenados
+    [OK  ] 1 dia detectado
+    [OK  ] exatamente 2 blocos (deu 2)
+    [OK  ] os blocos comecam as 10h e as 14h
+    [OK  ] limiar decidido automaticamente (auto/ratio)
+    [OK  ] 30 clipes de audio externo lidos
+    [OK  ] o horario dos WAV veio do chunk BWF bext (nao de mtime)
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (2 usadas)
+    [OK  ] 90 pathurl no formato file://
+    XML: {'sequences': 1, 'clipitems': 150, 'markers': 2, 'video_tracks': 2, 'audio_tracks': 3, 'bins': 3, 'labels': 2}
+    [OK  ] marcadores de bloco no XML
+    [OK  ] trilhas de audio separadas por dispositivo (3)
+
+CENARIO 3: Pausa curta (~20 min)  =>  PASSOU
+    52 arquivos | 2 dispositivos | 1 dia(s) | 2 bloco(s) | 26 take(s)
+    leitura parcial: 329.2 KB de 3.5 MB (9.124%) via {'atoms': 52}
+    DIA 01 2026-08-13: 2 bloco(s), 52 clipes, limiar 9 min (auto/ratio)
+        BLOCO 01 10:00-10:42 | 26 clipes | 13 takes | cor Cerulean
+        BLOCO 02 11:06-11:48 | 26 clipes | 13 takes | cor Mango
+        -> maior salto 6.2x entre intervalos ordenados
+    [OK  ] 2 blocos mesmo com pausa de ~20 min (deu 2)
+    [OK  ] o limiar escolhido (9 min) ficou abaixo dos 30 min de um limiar fixo — e relativo, nao fixo
+    [OK  ] contraprova: limiar fixo de 30 min daria 1 bloco — e por isso que a deteccao e adaptativa
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (2 usadas)
+    [OK  ] 52 pathurl no formato file://
+
+CENARIO 4: Dia continuo (3h uniformes)  =>  PASSOU
+    38 arquivos | 2 dispositivos | 1 dia(s) | 1 bloco(s) | 19 take(s)
+    leitura parcial: 233.0 KB de 2.5 MB (9.081%) via {'atoms': 38}
+    DIA 01 2026-08-13: 1 bloco(s), 38 clipes, limiar bloco unico (unico)
+        BLOCO 01 09:00-11:59 | 38 clipes | 19 takes | cor Cerulean
+        -> intervalos do dia sao parecidos (maior salto 1.0x) — bloco unico, sem divisao artificial
+    [OK  ] 1 bloco so (deu 1) — nenhuma divisao artificial
+    [OK  ] nenhum limiar aplicado: o dia foi classificado como uniforme
+    [OK  ] a nota explica a decisao: intervalos do dia sao parecidos (maior salto 1.0x) — bloco unico, sem divisao artificial
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (1 usadas)
+    [OK  ] 38 pathurl no formato file://
+
+CENARIO 5: Semana completa (5 dias)  =>  PASSOU
+    300 arquivos | 4 dispositivos | 5 dia(s) | 14 bloco(s) | 115 take(s)
+    leitura parcial: 1.5 MB de 100.8 MB (1.479%) via {'atoms': 245, 'bwf': 55}
+    DIA 01 2026-08-13: 3 bloco(s), 52 clipes, limiar 34 min (auto/ratio)
+        BLOCO 01 09:30-10:20 | 24 clipes | 8 takes | cor Cerulean
+        BLOCO 02 13:00-14:11 | 22 clipes | 11 takes | cor Mango
+        BLOCO 03 19:00-19:35 | 6 clipes | 6 takes | cor Forest
+        -> maior salto 21.8x entre intervalos ordenados
+    DIA 02 2026-08-14: 2 bloco(s), 62 clipes, limiar 41 min (auto/ratio)
+        BLOCO 01 10:00-10:57 | 18 clipes | 9 takes | cor Cerulean
+        BLOCO 02 15:00-16:12 | 44 clipes | 11 takes | cor Mango
+        -> maior salto 33.6x entre intervalos ordenados
+    DIA 03 2026-08-15: 4 bloco(s), 61 clipes, limiar 31 min (auto/ratio)
+        BLOCO 01 08:30-09:12 | 21 clipes | 7 takes | cor Cerulean
+        BLOCO 02 11:30-12:13 | 14 clipes | 7 takes | cor Mango
+        BLOCO 03 15:00-15:42 | 21 clipes | 7 takes | cor Forest
+        BLOCO 04 20:00-20:29 | 5 clipes | 5 takes | cor Rose
+        -> maior salto 18.8x entre intervalos ordenados
+    DIA 04 2026-08-16: 2 bloco(s), 60 clipes, limiar 43 min (auto/ratio)
+        BLOCO 01 09:00-10:12 | 33 clipes | 11 takes | cor Cerulean
+        BLOCO 02 14:30-15:27 | 27 clipes | 9 takes | cor Mango
+        -> maior salto 35.8x entre intervalos ordenados
+    DIA 05 2026-08-17: 3 bloco(s), 65 clipes, limiar 30 min (auto/ratio)
+        BLOCO 01 10:30-11:19 | 24 clipes | 8 takes | cor Cerulean
+        BLOCO 02 13:30-14:13 | 14 clipes | 7 takes | cor Mango
+        BLOCO 03 17:00-17:56 | 27 clipes | 9 takes | cor Forest
+        -> maior salto 18.0x entre intervalos ordenados
+    [OK  ] 5 dias separados (deu 5)
+    [OK  ] cada dia com 2 a 4 blocos: [3, 2, 4, 2, 3]
+    [OK  ] nenhum dia virou bloco unico por engano — a deteccao rodou DENTRO de cada dia, nao sobre a semana
+    [OK  ] contraprova: sem separar por dia primeiro, a semana daria apenas 5 bloco(s) — as pausas internas desapareceriam
+    [OK  ] o 1o bloco de todo dia tem a mesma cor ({'Cerulean'}) — a paleta reinicia por dia
+    [OK  ] blocos consecutivos nunca repetem cor
+    [OK  ] dispositivos variando entre os dias: ['DJI Osmo Action 4', 'Hollyland', 'Sony ILCE-7M3', 'iPhone iPhone 15 Pro']
+    [OK  ] sanidade: nenhum dispositivo ficou isolado em datas proprias
+    [OK  ] 6 XMLs gerados: 5 dias + MASTER (deu 6)
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (3 usadas)
+    [OK  ] 52 pathurl no formato file://
+    [OK  ] DIA_02_2026-08-14.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (2 usadas)
+    [OK  ] 62 pathurl no formato file://
+    [OK  ] DIA_03_2026-08-15.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (4 usadas)
+    [OK  ] 61 pathurl no formato file://
+    [OK  ] DIA_04_2026-08-16.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (2 usadas)
+    [OK  ] 60 pathurl no formato file://
+    [OK  ] DIA_05_2026-08-17.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (3 usadas)
+    [OK  ] 65 pathurl no formato file://
+    [OK  ] MASTER_todos_os_dias.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (4 usadas)
+    [OK  ] 300 pathurl no formato file://
+    MASTER: {'sequences': 1, 'clipitems': 545, 'markers': 19, 'video_tracks': 3, 'audio_tracks': 4, 'bins': 19, 'labels': 4}
+    [OK  ] MASTER tem marcador de dia e de bloco (19)
+    total de clipitems nos XMLs: 1090
+
+CENARIO 6: Fragmentacao excessiva  =>  PASSOU
+    80 arquivos | 2 dispositivos | 1 dia(s) | 6 bloco(s) | 40 take(s)
+    leitura parcial: 486.2 KB de 5.2 MB (9.158%) via {'atoms': 80}
+    DIA 01 2026-08-13: 6 bloco(s), 80 clipes, limiar 12 min (auto/jenks)
+        BLOCO 01 08:00-08:12 | 8 clipes | 4 takes | cor Cerulean
+        BLOCO 02 08:27-09:01 | 16 clipes | 8 takes | cor Mango
+        BLOCO 03 09:24-10:00 | 16 clipes | 8 takes | cor Forest
+        BLOCO 04 10:18-10:30 | 8 clipes | 4 takes | cor Rose
+        BLOCO 05 10:57-11:30 | 16 clipes | 8 takes | cor Iris
+        BLOCO 06 11:50-12:28 | 16 clipes | 8 takes | cor Caribbean
+        -> razao maxima fraca (2.1x), jenks separou (GVF 0.83, 4.3x); teto de 6 blocos/dia acionado: 1 fronteira(s) mesclada(s) pelos menores intervalos
+    [OK  ] teto de 6 blocos/dia respeitado (deu 6)
+    sem teto: 7 blocos
+    [OK  ] sem teto daria 7 blocos — o teto e o que mantem a visualizacao util
+    [OK  ] com teto de 3, mescla pelos menores intervalos ate 3 blocos (deu 3)
+    [OK  ] a nota registra que o teto foi acionado
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (6 usadas)
+    [OK  ] 80 pathurl no formato file://
+
+CENARIO 7: Virada de madrugada  =>  PASSOU
+    51 arquivos | 3 dispositivos | 1 dia(s) | 2 bloco(s) | 17 take(s)
+    leitura parcial: 218.6 KB de 28.5 MB (0.748%) via {'atoms': 34, 'bwf': 17}
+    DIA 01 2026-08-13: 2 bloco(s), 51 clipes, limiar 23 min (auto/ratio)
+        BLOCO 01 22:00-23:20 | 27 clipes | 9 takes | cor Cerulean
+        BLOCO 02 00:15-01:24 | 24 clipes | 8 takes | cor Mango
+        -> maior salto 5.4x entre intervalos ordenados
+    [OK  ] tudo num unico dia (deu 1)
+    [OK  ] o dia e o da virada (2026-08-13), nao o seguinte (deu 2026-08-13)
+    [OK  ] o mesmo dia contem noite e madrugada: horas [0, 1, 22, 23]
+    [OK  ] contraprova: virada a meia-noite partiria em 2 dias
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (2 usadas)
+    [OK  ] 51 pathurl no formato file://
+
+CENARIO 8: Metadado ausente  =>  PASSOU
+    33 arquivos | 3 dispositivos | 1 dia(s) | 3 bloco(s) | 17 take(s)
+    leitura parcial: 211.3 KB de 2.3 MB (9.092%) via {'atoms': 32, 'ffprobe+mtime': 1}
+    DIA 01 2026-08-13: 3 bloco(s), 33 clipes, limiar 14 min (auto/ratio)
+        BLOCO 01 10:00-10:32 | 16 clipes | 8 takes | cor Cerulean
+        BLOCO 02 13:18-13:18 | 1 clipes | 1 takes | cor Mango
+        BLOCO 03 14:00-14:33 | 16 clipes | 8 takes | cor Forest
+        -> maior salto 8.6x entre intervalos ordenados
+    [OK  ] exatamente 1 arquivo caiu no fallback (deu 1)
+    fallback: C0025.MP4 via mtime → 2026-08-13 13:18:00 (confianca baixa)
+    [OK  ] a fonte registrada e mtime
+    [OK  ] o clipe carrega aviso: sem creation_time no arquivo — usou a data de modificacao (menos confiavel)
+    [OK  ] mesmo assim ele foi posicionado na timeline
+    [OK  ] o clipe de fallback ficou visivelmente isolado em BLOCO 02 — prova de que mtime posiciona errado, e de que da para enxergar isso
+    [OK  ] nenhum arquivo foi perdido no caminho
+    [OK  ] com o fallback desligado (regra do Drive), o arquivo vira 'data desconhecida' (deu 1)
+    [OK  ] e o motivo aparece no aviso do clipe
+    [OK  ] o XML marca o clipe de fallback nos comentarios do clipe
+    [OK  ] DIA_01_2026-08-13.xml: raiz e <xmeml>
+    [OK  ] xmeml version=4
+    [OK  ] todas as cores sao labels validas do Premiere (3 usadas)
+    [OK  ] 33 pathurl no formato file://
+
+EXTRA: Leitura parcial em arquivo de 3 GB  =>  PASSOU
+    moov no fim: arquivo de 3.0 GB, lidos 5.0 KB em 5 leituras (0.000159%) → creation_time 2026-08-13 13:02:02
+    [OK  ] moov no fim: leu a data sem abrir o arquivo todo
+    [OK  ] moov no fim: leu menos de 1 MB (5.0 KB) de 3.0 GB
+    moov no inicio: arquivo de 3.0 GB, lidos 5.0 KB em 4 leituras (0.000159%) → creation_time 2026-08-13 13:02:02
+    [OK  ] moov no inicio: leu a data sem abrir o arquivo todo
+    [OK  ] moov no inicio: leu menos de 1 MB (5.0 KB) de 3.0 GB
+    [OK  ] sidecar lido em 342 bytes, sem tocar no arquivo de 3 GB
+
+EXTRA: Modo manifesto de ingestao  =>  PASSOU
+    manifesto: 90 arquivos, 0 B lidos na geracao
+    [OK  ] manifesto.json criado na pasta do material
+    com manifesto: {'manifesto': 90}, 0 B lidos
+    [OK  ] nenhum byte de midia transferido na 2a leitura (deu 0)
+    [OK  ] todos os 90 arquivos vieram do manifesto
+
+EXTRA: Cache persistente (chave sem mtime)  =>  PASSOU
+    1a passada: 329.2 KB lidos, {'atoms': 52}
+    2a passada: 0 B lidos, {'cache': 52}
+    [OK  ] 2a passada nao transferiu nada
+    [OK  ] todos os arquivos vieram do cache mesmo com o mtime alterado
+
+EXTRA: Fechamento de tempo morto  =>  PASSOU
+    preserve: timeline de 5.99h (tempo morto encurtado: 0.00h)
+    compress: timeline de 0.69h (tempo morto encurtado: 5.31h)
+    close: timeline de 0.11h (tempo morto encurtado: 5.88h)
+    [OK  ] preserve > compress > close: {'preserve': 21566, 'compress': 2468, 'close': 404}
+    [OK  ] no modo preserve a pausa de 2h aparece inteira na timeline
+
+EXTRA: Troca da raiz da midia no XML  =>  PASSOU
+    [OK  ] os pathurl saem apontando para a raiz nova (sem relink manual)
+    [OK  ] nenhum caminho antigo sobrou no XML
+
+==============================================================================
+RESULTADO: 13/13 verificacoes de cenario passaram
+==============================================================================

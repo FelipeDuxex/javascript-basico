@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timeline Sync</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark"></span>
+    <h1>Timeline Sync</h1>
+    <span class="sub" id="projeto-nome">projeto</span>
+  </div>
+  <div class="topinfo">
+    <span id="info-cache" class="pill">cache: —</span>
+    <span id="info-volume" class="pill"></span>
+    <button id="btn-relatorio" class="ghost">Relatório</button>
+  </div>
+</header>
+
+<section class="importar">
+  <div class="row">
+    <label for="pastas">Pastas com o material bruto (uma por linha — subpastas incluídas)</label>
+    <textarea id="pastas" rows="2" spellcheck="false"
+      placeholder="/Volumes/GoogleDrive/Meu Drive/MINISSERIE/SEMANA_01"></textarea>
+  </div>
+  <div class="row acoes">
+    <button id="btn-varrer" class="primary">Varrer e organizar</button>
+    <button id="btn-cancelar" class="ghost" disabled>Cancelar</button>
+    <button id="btn-manifesto" class="ghost" title="Rodar no cartão/disco local antes de subir pro Drive">Gerar manifesto de ingestão</button>
+    <span class="grow"></span>
+    <span id="resumo-topo" class="resumo"></span>
+  </div>
+  <div id="progresso" class="progresso oculto">
+    <div class="barra"><div class="preenche" id="progresso-preenche"></div></div>
+    <span id="progresso-texto" class="mono"></span>
+  </div>
+  <div id="avisos" class="avisos"></div>
+</section>
+
+<main class="grade">
+
+  <aside class="painel dias">
+    <h2>Dias</h2>
+    <ul id="lista-dias" class="lista-dias"></ul>
+    <div class="bloco-config">
+      <h3>Limiar global</h3>
+      <p class="dica">Aplica o mesmo limiar de pausa a todos os dias. Útil quando
+        a produção teve rotina consistente.</p>
+      <div class="linha">
+        <input type="range" id="limiar-global" min="120" max="7200" step="60" value="1800">
+        <span id="limiar-global-valor" class="mono">30 min</span>
+      </div>
+      <div class="linha">
+        <button id="btn-limiar-global" class="ghost small">Aplicar a todos</button>
+        <button id="btn-limiar-auto" class="ghost small">Volta ao automático</button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="painel timeline-painel">
+    <div class="cabeca">
+      <h2 id="titulo-dia">Nenhum dia carregado</h2>
+      <div class="cabeca-info" id="info-dia"></div>
+    </div>
+
+    <div class="controles-dia">
+      <label>Limiar deste dia</label>
+      <input type="range" id="limiar-dia" min="120" max="7200" step="60" value="1800">
+      <span id="limiar-dia-valor" class="mono">—</span>
+      <button id="btn-limiar-dia-auto" class="ghost small">automático</button>
+      <span class="grow"></span>
+      <label class="inline">Zoom</label>
+      <input type="range" id="zoom" min="20" max="600" step="10" value="120">
+    </div>
+
+    <div id="timeline" class="timeline">
+      <p class="vazio">Aponte as pastas e clique em <strong>Varrer e organizar</strong>.</p>
+    </div>
+
+    <div id="blocos-lista" class="blocos-lista"></div>
+  </section>
+
+  <aside class="painel lateral">
+    <div class="aba-barra">
+      <button class="aba ativa" data-aba="clipe">Clipe</button>
+      <button class="aba" data-aba="dispositivos">Dispositivos</button>
+      <button class="aba" data-aba="ajustes">Ajustes</button>
+      <button class="aba" data-aba="exportar">Exportar</button>
+    </div>
+
+    <div class="aba-conteudo ativa" id="aba-clipe">
+      <p class="dica">Clique num clipe da timeline para ver o metadado bruto.</p>
+      <dl id="detalhe-clipe" class="detalhe"></dl>
+    </div>
+
+    <div class="aba-conteudo" id="aba-dispositivos">
+      <h3>Perfis salvos</h3>
+      <div id="lista-dispositivos" class="lista-dispositivos"></div>
+      <h3>Cadastrar / recalibrar câmera</h3>
+      <p class="dica">Dois clipes do mesmo momento: um da câmera, um do iPhone.
+        Não precisa ter começado no mesmo instante — o iPhone é sempre assumido
+        como a hora correta.</p>
+      <label>Clipe da câmera</label>
+      <input type="text" id="cal-camera" class="mono" placeholder="/.../C0020.MP4">
+      <label>Clipe do iPhone</label>
+      <input type="text" id="cal-iphone" class="mono" placeholder="/.../IMG_0001.MOV">
+      <label class="check"><input type="checkbox" id="cal-audio" checked>
+        Refinar pelo pico de áudio (palma/claquete)</label>
+      <button id="btn-calibrar" class="primary small">Calibrar</button>
+      <div id="cal-resultado" class="resultado"></div>
+    </div>
+
+    <div class="aba-conteudo" id="aba-ajustes">
+      <h3>Dia e fuso</h3>
+      <label>Fuso do projeto</label>
+      <input type="text" id="cfg-timezone" class="mono">
+      <label>Virada de dia (h) — 4h mantém a madrugada no dia anterior</label>
+      <input type="number" id="cfg-day-start" step="0.5" min="0" max="12">
+
+      <h3>Detecção de blocos</h3>
+      <label>Método</label>
+      <select id="cfg-block-method">
+        <option value="auto">automático (razão máxima + jenks)</option>
+        <option value="ratio">razão máxima entre intervalos</option>
+        <option value="jenks">Jenks natural breaks</option>
+        <option value="kmeans">k-means 1D (k=2)</option>
+        <option value="fixo">limiar fixo</option>
+      </select>
+      <label>Piso mínimo de pausa (s)</label>
+      <input type="number" id="cfg-min-gap" step="10" min="0">
+      <label>Teto de blocos por dia</label>
+      <input type="number" id="cfg-max-blocks" step="1" min="1" max="16">
+      <label>Salto mínimo para considerar corte (x)</label>
+      <input type="number" id="cfg-min-ratio" step="0.1" min="1">
+      <label>Mínimo de clipes para dividir o dia</label>
+      <input type="number" id="cfg-min-clips" step="1" min="2">
+
+      <h3>Takes</h3>
+      <label>Janela de agrupamento (s)</label>
+      <input type="number" id="cfg-take-window" step="1" min="0">
+
+      <h3>Tempo morto</h3>
+      <select id="cfg-gap-mode">
+        <option value="preserve">preservar o tempo real</option>
+        <option value="compress">comprimir proporcionalmente</option>
+        <option value="close">fechar totalmente</option>
+      </select>
+      <label>Fator de compressão (0,1 = 10% do vazio)</label>
+      <input type="number" id="cfg-gap-factor" step="0.05" min="0" max="1">
+      <label>Vazio mínimo para tratar (s)</label>
+      <input type="number" id="cfg-gap-min" step="30" min="0">
+
+      <h3>Cores e sequência</h3>
+      <label>Colorir por</label>
+      <select id="cfg-color-mode">
+        <option value="bloco">bloco (reinicia a cada dia) — padrão</option>
+        <option value="dia">dia</option>
+        <option value="dispositivo">dispositivo</option>
+      </select>
+      <div class="paleta" id="paleta"></div>
+      <label>Resolução da sequência</label>
+      <div class="linha">
+        <input type="number" id="cfg-width" step="2" min="16">
+        <span>x</span>
+        <input type="number" id="cfg-height" step="2" min="16">
+      </div>
+      <label>Frame rate (timebase)</label>
+      <input type="number" id="cfg-timebase" step="1" min="1" max="120">
+
+      <h3>Leitura</h3>
+      <label>Workers paralelos (o gargalo é rede, não CPU)</label>
+      <input type="number" id="cfg-workers" step="1" min="1" max="32">
+      <label class="check"><input type="checkbox" id="cfg-ffprobe">
+        usar ffprobe como fallback (mais lento no Drive)</label>
+      <label class="check"><input type="checkbox" id="cfg-mtime">
+        usar mtime como último recurso (desligado automaticamente na nuvem)</label>
+      <button id="btn-limpar-cache" class="ghost small">Limpar cache de metadados</button>
+    </div>
+
+    <div class="aba-conteudo" id="aba-exportar">
+      <h3>Exportar XML (Final Cut Pro XML 7)</h3>
+      <label>Pasta de saída</label>
+      <input type="text" id="exp-saida" class="mono" value="saida">
+      <label>Dias</label>
+      <div id="exp-dias" class="checks"></div>
+      <label class="check"><input type="checkbox" id="exp-master" checked>
+        gerar também a sequência MASTER (todos os dias)</label>
+      <label class="check"><input type="checkbox" id="exp-unico">
+        tudo num único arquivo XML</label>
+
+      <h3>Raiz da mídia nos caminhos</h3>
+      <p class="dica">Se o Drive montar em outra letra/ponto de montagem, troque
+        a raiz aqui e reexporte — evita relink manual no Premiere.</p>
+      <label>Raiz original</label>
+      <input type="text" id="cfg-root-orig" class="mono">
+      <label>Substituir por</label>
+      <input type="text" id="cfg-root-novo" class="mono" placeholder="H:/Meu Drive/...">
+
+      <button id="btn-exportar" class="primary">Exportar</button>
+      <div id="exp-resultado" class="resultado"></div>
+
+      <h3>Refino opcional</h3>
+      <button id="btn-refinar" class="ghost small">Refinar sync por áudio (dia atual)</button>
+      <div id="refino-resultado" class="resultado"></div>
+    </div>
+  </aside>
+</main>
+
+<div id="modal" class="modal oculto">
+  <div class="modal-caixa">
+    <div class="modal-cabeca">
+      <h2 id="modal-titulo">Relatório</h2>
+      <button id="modal-fechar" class="ghost small">fechar</button>
+    </div>
+    <pre id="modal-corpo" class="mono"></pre>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

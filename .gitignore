@@ -1,0 +1,22 @@
+# material sintetico de teste — regerado com `python gerar_testes.py`
+material_teste/
+
+# saidas de trabalho
+saida/
+*.xml.tmp
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# estado local do app (fica em ~/.timeline_sync, mas por garantia)
+dispositivos.json
+cache_metadados.sqlite
+manifesto.json
+
+# sistema
+.DS_Store
+Thumbs.db
