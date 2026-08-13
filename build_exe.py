@@ -123,7 +123,9 @@ def construir(modo: str) -> str:
 
 
 def _roda(alvo: str, args: Sequence[str], timeout: int = 300):
+    # encoding explicito: o filho fala UTF-8, e o locale do Windows nao.
     return subprocess.run([alvo, *args], capture_output=True, text=True,
+                          encoding="utf-8", errors="replace",
                           timeout=timeout, cwd=RAIZ)
 
 
@@ -201,7 +203,8 @@ def verificar_interface(alvo: str) -> bool:
     proc = subprocess.Popen([alvo, "web", "--porta", str(porta),
                              "--sem-navegador"],
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            text=True, cwd=RAIZ, env=env)
+                            text=True, encoding="utf-8", errors="replace",
+                            cwd=RAIZ, env=env)
     try:
         base = f"http://127.0.0.1:{porta}"
         conteudo = {}

@@ -401,7 +401,39 @@ só vale de Vista pra frente e depende de quem está interpretando.
 
 ---
 
-## 14. Dois defeitos no refino por áudio, encontrados ao medir
+## 14. Saída de console forçada para UTF-8
+
+O primeiro build de Windows falhou na verificação com `UnicodeEncodeError:
+'charmap' codec can't encode character '→'`. O console do Windows usa
+cp1252 por padrão, e cp1252 não tem `→` — que aparece em toda a saída deste app
+("relógio marcava X → hora real Y", as notas de detecção de bloco, o display dos
+perfis). Isso derrubava `dispositivos`, `organizar` e `calibrar` no meio da
+execução — e não só no executável: **rodando do código-fonte num Windows dava o
+mesmo erro.**
+
+Duas medidas, porque uma só não basta:
+
+- `SetConsoleOutputCP(65001)` põe o console em UTF-8, para o texto *aparecer*
+  certo;
+- `reconfigure(errors="replace")` garante que, se ainda assim algum caractere não
+  couber (redirecionamento para arquivo, terminal antigo), ele vire `?` em vez de
+  abortar o comando. Perder um símbolo é aceitável; perder a execução inteira,
+  não.
+
+A alternativa seria trocar `→` por `->` em toda a saída. Rejeitei: o problema
+não é o caractere, é a saída não estar configurada — e o próximo símbolo fora do
+cp1252 traria o bug de volta.
+
+`PYTHONIOENCODING=cp1252` reproduz o erro exatamente no Linux, então a regressão
+está guardada por teste sem precisar de um Windows.
+
+**Este bug é o argumento a favor de verificar o binário de verdade.** O build
+passou, o `.exe` foi gerado, o `--versao` respondeu. Se a verificação parasse aí,
+o executável teria sido publicado quebrando no primeiro comando útil.
+
+---
+
+## 15. Dois defeitos no refino por áudio, encontrados ao medir
 
 Achados ao comparar os caminhos `numpy` e Python puro durante o trabalho de
 empacotamento. Ambos corrigidos, ambos com teste de regressão.

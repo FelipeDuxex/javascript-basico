@@ -1,7 +1,7 @@
 === RESUMO DA IMPORTACAO ===
 300 arquivos lidos | 4 dispositivos | 5 dias | 14 blocos | 115 takes
 Leitura parcial: 1.5 MB efetivamente transferidos de 100.8 MB totais (1.4789% do material)
-Tempo de leitura: 4s (3.6s)
+Tempo de leitura: 1s (0.6s)
 Estrategias de leitura: atoms: 245, bwf: 55
 
 --- DISPOSITIVOS ---

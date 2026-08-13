@@ -18,7 +18,7 @@ import traceback
 from typing import List, Optional, Sequence
 
 from . import APP_NAME, __version__
-from .runtime import app_dir, is_frozen, tool_status
+from .runtime import app_dir, configurar_console, is_frozen, tool_status
 
 PORTA_PADRAO = 8730
 TENTATIVAS_DE_PORTA = 20
@@ -72,6 +72,7 @@ def _pausa_se_duplo_clique(houve_erro: bool = False) -> None:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    configurar_console()
     args = list(sys.argv[1:] if argv is None else argv)
 
     # Com argumentos, comporta-se exatamente como a CLI.

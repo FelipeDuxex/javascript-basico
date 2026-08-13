@@ -22,6 +22,41 @@ import sys
 from typing import List, Optional
 
 
+def configurar_console() -> None:
+    """Garante que o console aguenta o texto que o app imprime.
+
+    O console do Windows usa cp1252 por padrao, e cp1252 nao tem `→` — que
+    aparece em todo lugar aqui ("relogio marcava X → hora real Y", as notas de
+    deteccao de bloco, o display dos perfis). O resultado era um
+    `UnicodeEncodeError` que derrubava `dispositivos`, `organizar` e `calibrar`
+    no meio da execucao, tanto no executavel quanto rodando do codigo-fonte.
+
+    Duas medidas, porque uma so nao basta:
+
+    * `SetConsoleOutputCP(65001)` poe o console em UTF-8, para o texto *aparecer*
+      certo;
+    * `reconfigure(errors="replace")` garante que, se ainda assim algum caractere
+      nao couber na saida (redirecionamento para arquivo, terminal antigo), ele
+      vire `?` em vez de abortar o comando. Perder um simbolo e aceitavel;
+      perder a execucao inteira, nao.
+    """
+    if sys.platform.startswith("win"):
+        try:
+            import ctypes
+            ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+            ctypes.windll.kernel32.SetConsoleCP(65001)
+        except Exception:
+            pass
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (ValueError, OSError):
+            pass
+
+
 def is_frozen() -> bool:
     """True quando rodando de dentro de um executavel PyInstaller."""
     return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")

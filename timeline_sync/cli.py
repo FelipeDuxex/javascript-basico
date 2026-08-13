@@ -14,6 +14,7 @@ from .config import Config, ProjectState, list_projects
 from .devices import DeviceRegistry, calibrate
 from .pipeline import Session
 from .report import build_report
+from .runtime import configurar_console
 from .timeutil import format_bytes, format_offset
 
 
@@ -312,6 +313,7 @@ def cmd_projetos(args) -> int:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    configurar_console()
     parser = _build_parser()
     args = parser.parse_args(argv)
     handlers = {

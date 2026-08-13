@@ -640,6 +640,37 @@ def teste_refino_audio(res: Resultado) -> None:
                   "de devolver ruido com cara de resultado")
 
 
+def teste_console_windows(res: Resultado) -> None:
+    """A CLI nao pode quebrar num console que nao aceita UTF-8.
+
+    O console do Windows usa cp1252, e cp1252 nao tem `→` — que aparece em todo
+    lugar na saida deste app. Isso derrubava `dispositivos`, `organizar` e
+    `calibrar` no meio da execucao, no executavel e tambem rodando do
+    codigo-fonte. `PYTHONIOENCODING=cp1252` reproduz exatamente o mesmo erro no
+    Linux, entao da para guardar a correcao sem precisar de um Windows.
+    """
+    import subprocess
+
+    env = dict(os.environ, PYTHONIOENCODING="cp1252")
+    pasta = os.path.join(MATERIAL, "04_dia_continuo")
+
+    comandos = [(["dispositivos"], "dispositivos")]
+    if os.path.isdir(pasta):
+        comandos.append((["organizar", pasta, "--sem-exportar",
+                          "--projeto", "cp1252"], "organizar"))
+
+    for args, nome in comandos:
+        proc = subprocess.run(
+            [sys.executable, "-m", "timeline_sync", *args],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            env=env, cwd=RAIZ, timeout=600,
+        )
+        quebrou = "UnicodeEncodeError" in (proc.stderr or "")
+        res.checa(proc.returncode == 0 and not quebrou,
+                  f"`{nome}` sobrevive a um console cp1252 (rc={proc.returncode}"
+                  + (", UnicodeEncodeError" if quebrou else "") + ")")
+
+
 def teste_executavel(res: Resultado) -> None:
     """Confere o empacotamento, se ja houver um binario construido.
 
@@ -699,6 +730,7 @@ EXTRAS: List[Tuple[str, Callable]] = [
     ("Fechamento de tempo morto", teste_tempo_morto),
     ("Troca da raiz da midia no XML", teste_raiz_midia),
     ("Refino por audio (numpy vs Python puro)", teste_refino_audio),
+    ("Console cp1252 (Windows)", teste_console_windows),
     ("Executavel empacotado", teste_executavel),
 ]
 
